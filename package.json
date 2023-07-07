@@ -15,6 +15,7 @@
     "process": "^0.11.10",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-easy-crop": "^4.0.1",
     "react-scripts": "5.0.0",
     "sass": "^1.63.6",
     "simple-react-lightbox": "^3.6.9-0",
@@ -25,7 +26,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build:deploy": "npm run build && firebase deploy -P images-gallery-2-a3dd1"
   },
   "eslintConfig": {
     "extends": [

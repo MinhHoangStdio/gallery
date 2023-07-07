@@ -6,6 +6,7 @@ import { Avatar, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
 import Options from "./Options";
 import useFirestore from "../../firebase/db/useFirestore";
+import { useAuth } from "../../context/AuthContext";
 
 function srcset(image, size, rows = 1, cols = 1) {
   return {
@@ -17,6 +18,7 @@ function srcset(image, size, rows = 1, cols = 1) {
 }
 
 export default function ImagesList() {
+  const { currentUser } = useAuth();
   const { documents } = useFirestore();
   return (
     <SimpleReactLightbox>
@@ -36,7 +38,9 @@ export default function ImagesList() {
                 ].rows
               }
             >
-              <Options imageId={item?.id} />
+              {currentUser?.uid === item?.data?.uid && (
+                <Options imageId={item?.id} />
+              )}
               <img
                 {...srcset(
                   item?.data?.imageURL,

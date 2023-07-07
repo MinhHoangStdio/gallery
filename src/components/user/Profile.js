@@ -1,4 +1,6 @@
 import {
+  Box,
+  IconButton,
   Avatar,
   DialogActions,
   DialogContent,
@@ -13,18 +15,23 @@ import uploadFile from "../../firebase/storage/uploadFile";
 import { updateProfile } from "firebase/auth";
 import deleteFile from "../../firebase/storage/deleteFile";
 import updateUserRecords from "../../firebase/db/updateUserRecords";
+import CropEasy from "../crop/CropEasy";
+import { Crop } from "@mui/icons-material";
+import { useEffect } from "react";
 
 const Profile = () => {
-  const { currentUser, setLoading, setAlert } = useAuth();
+  const { currentUser, setLoading, setAlert, modal, setModal } = useAuth();
   const [name, setName] = useState(currentUser?.displayName);
   const [file, setFile] = useState(null);
   const [photoURL, setPhotoURL] = useState(currentUser?.photoURL);
+  const [openCrop, setOpenCrop] = useState(false);
 
   const handleChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setFile(file);
       setPhotoURL(URL.createObjectURL(file));
+      setOpenCrop(true);
     }
   };
 
@@ -82,8 +89,14 @@ const Profile = () => {
 
     setLoading(false);
   };
-
-  return (
+  useEffect(() => {
+    if (openCrop) {
+      setModal({ ...modal, title: "Crop Profile Photo" });
+    } else {
+      setModal({ ...modal, title: "Update Profile" });
+    }
+  }, [openCrop]);
+  return !openCrop ? (
     <form onSubmit={handleSubmit}>
       <DialogContent dividers>
         <DialogContentText>
@@ -100,24 +113,37 @@ const Profile = () => {
           required
           onChange={(e) => setName(e.target.value)}
         />
-        <label htmlFor="profilePhoto">
-          <input
-            accept="image/*"
-            id="profilePhoto"
-            type="file"
-            style={{ display: "none" }}
-            onChange={handleChange}
-          />
-          <Avatar
-            src={photoURL}
-            sx={{ width: 75, height: 75, cursor: "pointer" }}
-          />
-        </label>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <label htmlFor="profilePhoto">
+            <input
+              accept="image/*"
+              id="profilePhoto"
+              type="file"
+              style={{ display: "none" }}
+              onChange={handleChange}
+            />
+            <Avatar
+              src={photoURL}
+              sx={{ width: 75, height: 75, cursor: "pointer" }}
+            />
+          </label>
+          {file && (
+            <IconButton
+              aria-label="Crop"
+              color="primary"
+              onClick={() => setOpenCrop(true)}
+            >
+              <Crop />
+            </IconButton>
+          )}
+        </Box>
       </DialogContent>
       <DialogActions>
         <SubmitButton />
       </DialogActions>
     </form>
+  ) : (
+    <CropEasy {...{ photoURL, setOpenCrop, setPhotoURL, setFile }} />
   );
 };
 
